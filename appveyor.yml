@@ -1,0 +1,67 @@
+version: 1.0.0.{build}
+
+environment:
+    matrix:
+        # Windows 64-bit
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
+          QTDIR: C:\Qt\5.11\msvc2017_64
+          BUILDER: NMAKE
+          ARCH: x64
+          OS: windows
+        # Linux
+        - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+          BUILDER: MAKE
+          ARCH: x64
+          OS: linux
+        # Windows 32-Bit
+        - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+          QTDIR: C:\Qt\5.11\mingw53_32
+          BUILDER: MINGW
+          ARCH: x86
+          OS: windows
+          
+services:
+    - Docker
+
+install:
+    # Windows
+    - cmd: set PATH=%QTDIR%\bin;%PATH%
+    - cmd: if "%BUILDER%"=="MINGW" set PATH=C:\Qt\Tools\mingw530_32\bin;%PATH%
+    - cmd: if "%BUILDER%"=="NMAKE" call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvars64.bat"
+    # Linux
+    - sh: docker build . -t researcher-ci
+    
+build_script:
+    # Windows
+    - cmd: qmake Researcher.pro
+    - cmd: if "%BUILDER%"=="MINGW" mingw32-make
+    - cmd: if "%BUILDER%"=="NMAKE" nmake
+    # Linux
+    - sh: docker run -w="/app" -v "$(pwd)":/app researcher-ci qmake
+    - sh: docker run -w="/app" -v "$(pwd)":/app researcher-ci make
+
+after_build:
+    # Windows
+    - cmd: md Researcher-windows
+    - cmd: move release\Researcher.exe Researcher-windows\Researcher.exe 
+    - cmd: windeployqt --release --no-translations --no-angle --no-plugins --no-opengl-sw Researcher-windows\Researcher.exe
+    - cmd: del Researcher-windows\vcredist*.exe
+    - cmd: del Researcher-windows\vc_redist*.exe
+    - cmd: xcopy /I %QTDIR%\plugins\platforms\qwindows.dll Researcher-windows\platforms\
+    - cmd: 7z a Researcher-windows-%ARCH%.zip Researcher-windows\
+    # Linux
+    - sh: zip -r Researcher-linux-x64.zip Researcher
+    
+artifacts:
+    - path: Researcher-%OS%-%ARCH%.zip
+
+deploy:
+    provider: GitHub
+    description: ''
+    auth_token:
+        secure: KPKgc2JaeXV8NBnz+72ILmsh7hKA3v7fWYG4D7X4Oxn7zplWJwP/eeWoObEg9YDH
+    artifact: Researcher-%OS%-%ARCH%.zip
+    draft: false
+    prerelease: true
+    on:
+        APPVEYOR_REPO_TAG: true
