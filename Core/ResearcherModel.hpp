@@ -21,9 +21,9 @@
 #define RESEARCHERMODEL_HPP
 
 #include <QAbstractTableModel>
-#include <Core/ResearcherFrame.hpp>
 #include <QVector>
 #include <cstdint>
+#include <Core/ResearcherFrame.hpp>
 
 class ResearcherModel : public QAbstractTableModel
 {

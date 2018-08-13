@@ -2,7 +2,7 @@
  * This file is part of Researcher
  * Copyright (C) 2018 by Admiral_Fish
  *
- * This program is free software; you can redis(tr)ibute it and/or
+ * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 3
  * of the License, or (at your option) any later version.
@@ -71,11 +71,10 @@ QVariant ResearcherModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::DisplayRole)
     {
-        int column = index.column();
         ResearcherFrame frame = model[index.row()];
         if (flag)
         {
-            switch (column)
+            switch (index.column())
             {
                 case 0:
                     return frame.getFrame();
@@ -118,14 +117,14 @@ QVariant ResearcherModel::data(const QModelIndex &index, int role) const
                 case 19:
                     return frame.getDiv656();
                 case 20:
-                    return frame.getLowBit();
-                case 21:
                     return frame.getHighBit();
+                case 21:
+                    return frame.getLowBit();
             }
         }
         else
         {
-            switch (column)
+            switch (index.column())
             {
                 case 0:
                     return frame.getFrame();
@@ -164,9 +163,9 @@ QVariant ResearcherModel::data(const QModelIndex &index, int role) const
                 case 17:
                     return frame.getDiv656();
                 case 18:
-                    return frame.getLowBit();
-                case 19:
                     return frame.getHighBit();
+                case 19:
+                    return frame.getLowBit();
             }
         }
     }
@@ -216,15 +215,14 @@ QVariant ResearcherModel::headerData(int section, Qt::Orientation orientation, i
             case 17:
                 return flag ? "%25" : "/656";
             case 18:
-                return flag ? "%100" : "LBit";
+                return flag ? "%100" : "HBit";
             case 19:
-                return flag ? "/656" : "HBit";
+                return flag ? "/656" : "LBit";
             case 20:
-                return "LBit";
-            case 21:
                 return "HBit";
+            case 21:
+                return "LBit";
         }
-
     }
     return QVariant();
 }

@@ -1,6 +1,6 @@
 /*
  * This file is part of Researcher
- * Copyright (C) 2018 by Admiral_Fish, bumba, and EzPzStreamz
+ * Copyright (C) 2018 by Admiral_Fish
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -61,28 +61,28 @@ void Researcher::on_pushButtonGenerate32Bit_clicked()
             switch (ui->comboBoxRNG32Bit->currentIndex())
             {
                 case 0:
-                    rng = new PokeRNG(static_cast<u32>(seed));
+                    rng = new PokeRNG(static_cast<u32>(seed), startingFrame - 1);
                     break;
                 case 1:
-                    rng = new PokeRNGR(static_cast<u32>(seed));
+                    rng = new PokeRNGR(static_cast<u32>(seed), startingFrame - 1);
                     break;
                 case 2:
-                    rng = new XDRNG(static_cast<u32>(seed));
+                    rng = new XDRNG(static_cast<u32>(seed), startingFrame - 1);
                     break;
                 case 3:
-                    rng = new XDRNGR(static_cast<u32>(seed));
+                    rng = new XDRNGR(static_cast<u32>(seed), startingFrame - 1);
                     break;
                 case 4:
-                    rng = new ARNG(static_cast<u32>(seed));
+                    rng = new ARNG(static_cast<u32>(seed), startingFrame - 1);
                     break;
                 case 5:
-                    rng = new ARNGR(static_cast<u32>(seed));
+                    rng = new ARNGR(static_cast<u32>(seed), startingFrame - 1);
                     break;
                 case 6:
-                    rng = new MersenneTwister(static_cast<u32>(seed));
+                    rng = new MersenneTwister(static_cast<u32>(seed), startingFrame - 1);
                     break;
                 case 7:
-                    rng = new MersenneTwisterUntempered(static_cast<u32>(seed));
+                    rng = new MersenneTwisterUntempered(static_cast<u32>(seed), startingFrame - 1);
                     break;
                 case 8:
                     if (maxFrames > 227 || startingFrame > 227 || (startingFrame + maxFrames > 227))
@@ -92,7 +92,7 @@ void Researcher::on_pushButtonGenerate32Bit_clicked()
                         error.exec();
                         return;
                     }
-                    rng = new MersenneTwisterFast(static_cast<u32>(seed), maxFrames);
+                    rng = new MersenneTwisterFast(static_cast<u32>(seed), maxFrames, startingFrame - 1);
                     break;
             }
         }
@@ -100,7 +100,7 @@ void Researcher::on_pushButtonGenerate32Bit_clicked()
         {
             u32 add = ui->textBoxAdd32Bit->text().toUInt(nullptr, 16);
             u32 mult = ui->textBoxMult32Bit->text().toUInt(nullptr, 16);
-            rng = new LCRNG(add, mult, static_cast<u32>(seed));
+            rng = new LCRNG(add, mult, static_cast<u32>(seed), startingFrame - 1);
         }
     }
     else if (ui->rngSelection->currentIndex() == 1)
@@ -110,15 +110,15 @@ void Researcher::on_pushButtonGenerate32Bit_clicked()
             switch (ui->comboBoxRNG64Bit->currentIndex())
             {
                 case 0:
-                    rng64 = new BWRNG(seed);
+                    rng64 = new BWRNG(seed, startingFrame - 1);
                     break;
                 case 1:
-                    rng64 = new BWRNGR(seed);
+                    rng64 = new BWRNGR(seed, startingFrame - 1);
                     break;
                 case 2:
                     if (seed > 0xffffffff)
                         seed >>= 32;
-                    rng64 = new SFMT(static_cast<u32>(seed));
+                    rng64 = new SFMT(static_cast<u32>(seed), startingFrame - 1);
                     break;
             }
         }
@@ -126,7 +126,7 @@ void Researcher::on_pushButtonGenerate32Bit_clicked()
         {
             u64 add = ui->textBoxAdd64Bit->text().toUInt(nullptr, 16);
             u64 mult = ui->textBoxMult64Bit->text().toUInt(nullptr, 16);
-            rng64 = new LCRNG64(add, mult, seed);
+            rng64 = new LCRNG64(add, mult, seed, startingFrame - 1);
         }
     }
     else
@@ -134,11 +134,10 @@ void Researcher::on_pushButtonGenerate32Bit_clicked()
         u32 status[4] = { ui->textBoxStatus0->text().toUInt(nullptr, 16), ui->textBoxStatus1->text().toUInt(nullptr, 16),
                           ui->textBoxStatus2->text().toUInt(nullptr, 16), ui->textBoxStatus3->text().toUInt(nullptr, 16)
                         };
-        rng = new TinyMT(status);
+        rng = new TinyMT(status, startingFrame - 1);
     }
 
     Calculator calc;
-
     calc["/"] = &Researcher::divide;
     calc["%"] = &Researcher::modulo;
     calc[">>"] = &Researcher::shiftRight;
@@ -219,13 +218,6 @@ void Researcher::on_pushButtonGenerate32Bit_clicked()
     Calculators[8] = calc[ui->comboBoxOperator9->currentText()];
     Calculators[9] = calc[ui->comboBoxOperator10->currentText()];
 
-    QVector<ResearcherFrame> frames;
-
-    if (rng64Bit)
-        rng64->advanceFrames(startingFrame - 1);
-    else
-        rng->advanceFrames(startingFrame - 1);
-
     QString textL[10] = { ui->comboBoxLValue1->currentText(), ui->comboBoxLValue2->currentText(),
                           ui->comboBoxLValue3->currentText(), ui->comboBoxLValue4->currentText(),
                           ui->comboBoxLValue5->currentText(), ui->comboBoxLValue6->currentText(),
@@ -240,6 +232,7 @@ void Researcher::on_pushButtonGenerate32Bit_clicked()
                           ui->comboBoxRValue9->currentText(), ui->comboBoxRValue10->currentText()
                         };
 
+    QVector<ResearcherFrame> frames;
     for (u32 i = startingFrame; i < maxFrames + startingFrame; i++)
     {
         ResearcherFrame frame(rng64Bit, i);
@@ -392,32 +385,32 @@ void Researcher::setupModels()
     ui->tableView->setModel(model);
     resizeHeader();
 
-    ui->textBoxStartingFrame->setValues(1, 0, true);
-    ui->textBoxMaxFrames->setValues(1, 0, true);
-    ui->textBoxSeed->setValues(0, 0, false);
-    ui->textBoxSearch->setValues(0, 0, false);
+    ui->textBoxStartingFrame->setValues(InputType::Frame64Bit);
+    ui->textBoxMaxFrames->setValues(InputType::Frame64Bit);
+    ui->textBoxSeed->setValues(InputType::Seed64Bit);
+    ui->textBoxSearch->setValues(InputType::Seed64Bit);
 
-    ui->textBoxMult32Bit->setValues(0, 32, false);
-    ui->textBoxAdd32Bit->setValues(0, 32, false);
+    ui->textBoxMult32Bit->setValues(InputType::Seed32Bit);
+    ui->textBoxAdd32Bit->setValues(InputType::Seed32Bit);
 
-    ui->textBoxMult64Bit->setValues(0, 0, false);
-    ui->textBoxAdd64Bit->setValues(0, 0, false);
+    ui->textBoxMult64Bit->setValues(InputType::Seed64Bit);
+    ui->textBoxAdd64Bit->setValues(InputType::Seed64Bit);
 
-    ui->textBoxStatus3->setValues(0, 32, false);
-    ui->textBoxStatus2->setValues(0, 32, false);
-    ui->textBoxStatus1->setValues(0, 32, false);
-    ui->textBoxStatus0->setValues(0, 32, false);
+    ui->textBoxStatus3->setValues(InputType::Seed32Bit);
+    ui->textBoxStatus2->setValues(InputType::Seed32Bit);
+    ui->textBoxStatus1->setValues(InputType::Seed32Bit);
+    ui->textBoxStatus0->setValues(InputType::Seed32Bit);
 
-    ui->lineEditRValue1->setValues(0, 32, false);
-    ui->lineEditRValue2->setValues(0, 32, false);
-    ui->lineEditRValue3->setValues(0, 32, false);
-    ui->lineEditRValue4->setValues(0, 32, false);
-    ui->lineEditRValue5->setValues(0, 32, false);
-    ui->lineEditRValue6->setValues(0, 32, false);
-    ui->lineEditRValue7->setValues(0, 32, false);
-    ui->lineEditRValue8->setValues(0, 32, false);
-    ui->lineEditRValue9->setValues(0, 32, false);
-    ui->lineEditRValue10->setValues(0, 32, false);
+    ui->lineEditRValue1->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue2->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue3->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue4->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue5->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue6->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue7->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue8->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue9->setValues(1, 0xffffffff, 16);
+    ui->lineEditRValue10->setValues(1, 0xffffffff, 16);
 
     keys["64Bit"] = 0;
     keys["32Bit"] = 1;
@@ -481,6 +474,6 @@ void Researcher::on_rngSelection_currentChanged(int index)
     ui->label_14->setVisible(index != 2);
     ui->comboBoxSearch->clear();
     QStringList items = index != 1 ? QStringList() << "32Bit" << "16Bit High" << "16Bit Low" :
-                        QStringList() << "64Bit" << "32Bit High" << "32Bit Low" << "16Bit High" << "16Bit Low" ;
+                        QStringList() << "64Bit" << "32Bit High" << "32Bit Low" << "16Bit High" << "16Bit Low";
     ui->comboBoxSearch->addItems(items);
 }
