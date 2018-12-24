@@ -21,8 +21,8 @@ build_script:
     - cmd: qmake Researcher.pro
     - cmd: jom -j %NUMBER_OF_PROCESSORS%
     # Linux
-    - sh: docker run -w="/app" -v "$(pwd)":/app rabits/qt:5.11-desktop sudo /opt/Qt/5.11.2/gcc_64/bin/qmake
-    - sh: docker run -w="/app" -v "$(pwd)":/app rabits/qt:5.11-desktop sudo make -j 4
+    - sh: docker run -w="/app" -v "$(pwd)":/app rabits/qt:5.12-desktop sudo /opt/Qt/5.12.0/gcc_64/bin/qmake
+    - sh: docker run -w="/app" -v "$(pwd)":/app rabits/qt:5.12-desktop sudo make -j 4
 
 after_build:
     # Windows
