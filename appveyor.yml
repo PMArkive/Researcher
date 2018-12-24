@@ -3,8 +3,10 @@ environment:
         # Windows
         - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
           QTDIR: C:\Qt\5.11\msvc2017_64
+          OS: windows
         # Linux
         - APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu
+          OS: linux
           
 services:
     - Docker
@@ -41,11 +43,8 @@ artifacts:
 
 deploy:
     provider: GitHub
-    description: ''
     auth_token:
         secure: KPKgc2JaeXV8NBnz+72ILmsh7hKA3v7fWYG4D7X4Oxn7zplWJwP/eeWoObEg9YDH
     artifact: Researcher-%OS%.zip
-    draft: false
-    prerelease: true
     on:
         APPVEYOR_REPO_TAG: true
