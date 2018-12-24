@@ -22,7 +22,6 @@
 
 #include <QAbstractTableModel>
 #include <QVector>
-#include <cstdint>
 #include <Core/ResearcherFrame.hpp>
 
 class ResearcherModel : public QAbstractTableModel

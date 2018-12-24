@@ -22,20 +22,16 @@
 
 #include <QMainWindow>
 #include <QMessageBox>
-#include <QStandardItemModel>
-#include <QVector>
+#include <Core/ResearcherModel.hpp>
 #include <Core/LCRNG.hpp>
 #include <Core/LCRNG64.hpp>
 #include <Core/MTRNG.hpp>
 #include <Core/SFMT.hpp>
 #include <Core/TinyMT.hpp>
-#include <Core/ResearcherModel.hpp>
 #include <Core/ResearcherFrame.hpp>
 
-typedef uint64_t u64;
-typedef uint32_t u32;
-typedef u64 (*func)(u64, u64);
-typedef QHash<QString, func> Calculator;
+using func = u64 (*)(u64, u64);
+using Calculator = QHash<QString, func>;
 
 namespace Ui
 {
@@ -46,13 +42,17 @@ class Researcher : public QMainWindow
 {
     Q_OBJECT
 
+public:
+    explicit Researcher(QWidget *parent = nullptr);
+    ~Researcher() override;;
+
 private:
     Ui::Researcher *ui;
     ResearcherModel *model = new ResearcherModel(this, false);
     QHash<QString, int> keys;
 
-    u64 getCustom(QString text, ResearcherFrame frame, QVector<ResearcherFrame> frames);
     void setupModels();
+    u64 getCustom(const QString &text, const ResearcherFrame &frame, const QVector<ResearcherFrame> &frames);
     void resizeHeader();
     QVector<bool> getHexCheck();
     static inline u64 divide(u64 x, u64 y) { return y == 0 ? 0 : x / y; }
@@ -71,10 +71,6 @@ private slots:
     void on_rngSelection_currentChanged(int index);
     void on_pushButtonSearch_clicked();
     void on_pushButtonNext_clicked();
-
-public:
-    explicit Researcher(QWidget *parent = nullptr);
-    ~Researcher();
 
 };
 

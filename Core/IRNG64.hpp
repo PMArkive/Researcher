@@ -20,10 +20,7 @@
 #ifndef IRNG64_HPP
 #define IRNG64_HPP
 
-#include <cstdint>
-
-typedef uint64_t u64;
-typedef uint32_t u32;
+#include <Core/Global.hpp>
 
 class IRNG64
 {
@@ -35,7 +32,7 @@ public:
     virtual void setSeed(u64 seed, u32 frames) = 0;
     virtual u64 getSeed() = 0;
     virtual void advanceFrames(u32 frames) = 0;
-    virtual ~IRNG64() { }
+    virtual ~IRNG64() = default;
 
 };
 

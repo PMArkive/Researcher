@@ -25,24 +25,9 @@
 class TinyMT : public IRNG
 {
 
-private:
-    static const u32 MAT1 = 0x8f7011ee;
-    static const u32 MAT2 = 0xfc78ff1f;
-    static const u32 TMAT = 0x3793fdff;
-    static const u32 TINYMT32MASK = 0x7FFFFFFF;
-    static const int TINYMT32SH0 = 1;
-    static const int TINYMT32SH1 = 10;
-    static const int TINYMT32SH8 = 8;
-    u32 *state = nullptr;
-    u32 seed;
-
-    void initialize(u32 seed);
-    void periodCertification();
-
 public:
     TinyMT(u32 seed, u32 frames = 0);
-    TinyMT(u32 st[], u32 frames = 0);
-    ~TinyMT() override { delete[] state; }
+    TinyMT(const u32 st[], u32 frames = 0);
     void advanceFrames(u32 frames) override;
     void nextState();
     u32 nextUInt() override;
@@ -52,6 +37,13 @@ public:
     void setSeed(u32 seed, u32 frames) override;
     u32 getSeed() override;
     u32 *getState();
+
+private:
+    u32 state[4];
+    u32 seed;
+
+    void initialize(u32 seed);
+    void periodCertification();
 
 };
 

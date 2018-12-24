@@ -20,10 +20,7 @@
 #ifndef IRNG_HPP
 #define IRNG_HPP
 
-#include <cstdint>
-
-typedef uint32_t u32;
-typedef uint16_t u16;
+#include <Core/Global.hpp>
 
 class IRNG
 {
@@ -35,7 +32,7 @@ public:
     virtual void setSeed(u32 seed, u32 frames) = 0;
     virtual u32 getSeed() = 0;
     virtual void advanceFrames(u32 frames) = 0;
-    virtual ~IRNG() { }
+    virtual ~IRNG() = default;
 
 };
 
